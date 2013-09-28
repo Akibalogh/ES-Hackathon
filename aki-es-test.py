@@ -14,10 +14,10 @@ if __name__ == "__main__":
 
 	topics_count = 0
 	#openfile to read different topics
-	topics_file = open('obama-words-short.txt', 'r')
+	topics_file = open('obama-words.txt', 'r')
 	for topic in topics_file.readlines():
 		topic_keyword = topic.lstrip().rstrip()
-		print "starting topic: ", topic_keyword
+		print topic_keyword
 		results = es.search(index="twitter", body = 
 		{ 
 			"size": "7364415", 
