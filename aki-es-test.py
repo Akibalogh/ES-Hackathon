@@ -16,15 +16,21 @@ if __name__ == "__main__":
 	}
 	)
 
-	#pprint(results)
+	#pprint(results['hits']['hits'][0])
 
 	print "max: ", results['hits']['max_score']
-	reslist = []
+	rescounter = 0
+	userlist = {}
+	tweetlist = {}
+	usersentimentlist = {}
 	negsentimentlist = {}
 	possentimentlist = {}
+	totalsentiment = {}
 
 	for result in results['hits']['hits']:
-		reslist.append(result['_source']['text'])
+		userlist[rescounter] = result['_source']['user']['screen_name']
+		tweetlist[rescounter] = result['_source']['text']
+		rescounter += 1
 		#res = result['_score']
 		#if (res > 4):
 		#	print res
@@ -37,14 +43,14 @@ if __name__ == "__main__":
 		line = line.rstrip().lstrip()
 
 		try: 
-			for res in reslist:
-				if (line in res and line != ''):
+			for tweetid, tweet in tweetlist.iteritems():
+				if (line in tweet and line != ''):
 					if (line in negsentimentlist):
-						negsentimentlist[line] += 1
+						negsentimentlist[userlist[tweetid]] -= 1
 					else:
-						negsentimentlist[line] = 1
+						negsentimentlist[userlist[tweetid]] = -1
 		except KeyError:
-			print "error: ", line, " | ", res
+			print "error: ", line, " | ", tweet
 
 		except UnicodeDecodeError:
 			continue
@@ -57,18 +63,20 @@ if __name__ == "__main__":
                 line = line.rstrip().lstrip()
 
                 try:
-                        for res in reslist:
-                                if (line in res and line != ''):
+                        for tweetid, tweet in tweetlist.iteritems():
+                                if (line in tweet and line != ''):
                                         if (line in possentimentlist):
-                                                possentimentlist[line] += 1
+                                                possentimentlist[userlist[tweetid]] += 1
                                         else:
-                                                possentimentlist[line] = 1
+                                                possentimentlist[userlist[tweetid]] = 1
                 except KeyError:
-                        print "error: ", line, " | ", res
+                        print "error: ", line, " | ", tweet
 
                 except UnicodeDecodeError:
                         continue
 
+	#pprint(negsentimentlist)
+	#pprint(userlist)
 
-	pprint(negsentimentlist)
-	pprint(possentimentlist)
+	lambdaresults = filter(lambda y: y > 3,possentimentlist)
+	pprint(lambdaresults)
