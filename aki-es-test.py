@@ -1,7 +1,21 @@
 import elasticsearch
+from optparse import OptionParser
 from pprint import pprint
 
 if __name__ == "__main__":
+	topics_filename = ""
+	output_file = ""
+	parser = OptionParser()
+	parser.add_option("-f", "--file", dest="topics_filename", help="read from FILE", metavar="FILE")
+	parser.add_option("-o", "--output", dest="output_file", help="write report to FILE", metavar="FILE")
+	(options, args) = parser.parse_args()
+
+	topics_filename = options.topics_filename
+	output_file = options.output_file
+	
+	print "Topics file: " , topics_filename
+	print "Output file: " , output_file
+	
 	es = elasticsearch.Elasticsearch()
 
 	es = elasticsearch.Elasticsearch(["cluster-7-slave-00.sl.hackreduce.net:9200"], sniff_on_start=False)
@@ -14,7 +28,7 @@ if __name__ == "__main__":
 
 	topics_count = 0
 	#openfile to read different topics
-	topics_file = open('obama-words.txt', 'r')
+	topics_file = open(topics_filename, 'r')
 	for topic in topics_file.readlines():
 		topic_keyword = topic.lstrip().rstrip()
 		print topic_keyword
