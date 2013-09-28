@@ -12,10 +12,12 @@ if __name__ == "__main__":
 	# this dict has <User , <Topic,Negative>>values
 	global_results_negative = {}	
 
+	topics_count = 0
 	#openfile to read different topics
-	topics_file = open('topics.txt', 'r')
+	topics_file = open('obama-words-short.txt', 'r')
 	for topic in topics_file.readlines():
 		topic_keyword = topic.lstrip().rstrip()
+		print "starting topic: ", topic_keyword
 		results = es.search(index="twitter", body = 
 		{ 
 			"size": "7364415", 
@@ -106,5 +108,46 @@ if __name__ == "__main__":
 				global_results_negative[user][topic_keyword] = score
 
 		#pprint(global_results_positive)
-		pprint(global_results_negative)
+		#pprint(global_results_negative)
+		topics_count +=1 
 	topics_file.close()
+	
+ 	global_user_dict= {}
+	global_topics_dict = {}
+	user_count = 0
+	topic_count = 0
+	data_matrix=[[0 for x in xrange(topics_count)] for x in xrange(len(global_results_positive.keys()) + len(global_results_negative.keys()))]
+
+	for user, topicshash in global_results_positive.iteritems():
+		if user not in global_user_dict:
+			global_user_dict[user] = user_count;
+			user_id = user_count
+			user_count += 1
+		else:
+			user_id = global_user_dict[user]
+		for topic, score in topicshash.iteritems():
+			if topic not in global_topics_dict:
+				global_topics_dict[topic] = topic_count
+				topic_id = topic_count
+				topic_count += 1
+			else:
+				topic_id= global_topics_dict[topic]
+			data_matrix[user_id][topic_id] += score
+
+	for user, topicshash in global_results_negative.iteritems():
+		if user not in global_user_dict:
+			global_user_dict[user] = user_count;
+			user_id = user_count
+			user_count += 1
+		else:
+			user_id = global_user_dict[user]
+		for topic, score in topicshash.iteritems():
+			if topic not in global_topics_dict:
+				global_topics_dict[topic] = topic_count
+				topic_id = topic_count
+				topic_count += 1
+			else:
+				topic_id= global_topics_dict[topic]
+			data_matrix[user_id][topic_id] += score
+
+	pprint(data_matrix)
